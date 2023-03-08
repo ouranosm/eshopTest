@@ -17,6 +17,15 @@ public class Order {
     @OneToMany(mappedBy ="order")
     private Set<Product> products;
 
+    public Order(){}
+
+    public Order(Long orderId, Long quantity, Long code, float discount){
+        this.orderId = orderId;
+        this.quantity = quantity;
+        this.code = code;
+        this.discount = discount;
+    }
+
     public Long getOrderId() {
         return orderId;
     }

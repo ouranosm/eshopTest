@@ -34,16 +34,16 @@ public class OrderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public  Order addOrder(@RequestBody Order order, @RequestParam List<Long> id){
-        if (id.isEmpty()) {
-            throw new RuntimeException("Failed to add order with empty product set.");
+    public  Order addOrder(@RequestBody Order order){
+        Set<Product> products = new HashSet<>();
+        for (Product p : order.getProducts()) {
+            // Retrieve the product from the database using its id
+            Product product = productRepository.findById(p.getId())
+                    .orElseThrow(() -> new RuntimeException("Failed to retrieve product with id: " + p.getId()));
+            products.add(product);
         }
-
-        List<Product> products = productRepository.findAllById(id);
-        if (products.size() != id.size()) {
-            throw new RuntimeException("Failed to add order with invalid product ids.");
-        }
-        order.setProducts(new HashSet<>(products));
+        // Set the set of products to the order object
+        order.setProducts(products);
         return orderRepository.save(order);
     }
     @GetMapping

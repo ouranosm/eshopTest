@@ -47,15 +47,15 @@ public class OrderController {
     }
     @GetMapping
     public Page<Order> all(
-            @RequestParam(required = false, name="Name")String name,
+            @RequestParam(required = false)Long orderId,
             @RequestParam(defaultValue = "0")int page,
             @RequestParam(defaultValue = "3")int size,
             @RequestParam(defaultValue = "ASC", required = false) String sort
     )
     {
         PageRequest paging = PageRequest.of(page, size).withSort(sort.equalsIgnoreCase("ASC")?
-                Sort.by("name").ascending():
-                Sort.by("name").descending());
+                Sort.by("orderId").ascending():
+                Sort.by("orderId").descending());
 
         return orderRepository.findAll(paging);
     }

@@ -28,6 +28,7 @@ public class ProductController {
     public  Product addProduct(@RequestBody Product product){
         return repo.save(product);
     }
+
     @GetMapping("/products")
     public Page<Product> all(
             @RequestParam(required = false, name="Name")String name,

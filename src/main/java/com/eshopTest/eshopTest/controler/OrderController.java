@@ -3,12 +3,14 @@ package com.eshopTest.eshopTest.controler;
 import com.eshopTest.eshopTest.entity.Order;
 import com.eshopTest.eshopTest.entity.Product;
 import com.eshopTest.eshopTest.repository.OrderRepository;
+import com.eshopTest.eshopTest.repository.ProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -16,11 +18,12 @@ import java.util.Set;
 @RequestMapping("/orders")
 public class OrderController {
     private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
 
 
-    public OrderController(OrderRepository orderRepository) {
+    public OrderController(OrderRepository orderRepository, ProductRepository productRepository) {
         this.orderRepository = orderRepository;
-
+        this.productRepository = productRepository;
     }
 
     @GetMapping("/{orderId}")
@@ -31,23 +34,20 @@ public class OrderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public  Order addOrder(@RequestBody Order order){
+    public  Order addOrder(@RequestBody Order order, @RequestParam List<Long> id){
+        if (id.isEmpty()) {
+            throw new RuntimeException("Failed to add order with empty product set.");
+        }
 
-        Set<Product> products =
-                order.getProducts();
-
-
-
-
-
+        List<Product> products = productRepository.findAllById(id);
+        if (products.size() != id.size()) {
+            throw new RuntimeException("Failed to add order with invalid product ids.");
+        }
+        order.setProducts(new HashSet<>(products));
         return orderRepository.save(order);
-
-
-
     }
     @GetMapping
     public Page<Order> all(
-            @RequestParam(required = false, name="Name")String name,
             @RequestParam(defaultValue = "0")int page,
             @RequestParam(defaultValue = "3")int size,
             @RequestParam(defaultValue = "ASC", required = false) String sort
@@ -63,7 +63,13 @@ public class OrderController {
     public void delete(@PathVariable Long id){
         Order match = orderRepository.findById(id).orElseThrow();
         orderRepository.delete(match);
+    }
 
+    @GetMapping("/{orderId}/products")
+    public Set<Product> getOrderProducts(@PathVariable Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Failed to retrieve order with id: " + orderId));
+        return order.getProducts();
     }
 
 

@@ -9,7 +9,7 @@ import java.util.Set;
 @Table(name ="orders")
 public class Order {
     @Id
-
+    @GeneratedValue
     private Long orderId;
     private long quantity;
     private  long code;

@@ -7,6 +7,7 @@ import java.util.Objects;
 @Table(name ="products")
 public class Product {
     @Id
+    @GeneratedValue
     private Long id;
     private String name;
     private String description;

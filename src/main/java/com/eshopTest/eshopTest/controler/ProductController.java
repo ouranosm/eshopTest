@@ -1,5 +1,6 @@
 package com.eshopTest.eshopTest.controler;
 
+import com.eshopTest.eshopTest.entity.Order;
 import com.eshopTest.eshopTest.entity.Product;
 import com.eshopTest.eshopTest.entity.ProductUpdate;
 import com.eshopTest.eshopTest.repository.ProductRepository;
@@ -8,7 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
+@RestController
 public class ProductController {
     private final ProductRepository repo;
 
@@ -17,9 +18,9 @@ public class ProductController {
     }
 
     @GetMapping("/products/{id}")
-    public Product one(@PathVariable Long orderId) {
-        return repo.findById(orderId)
-                .orElseThrow();
+    public Product getProductById(@PathVariable Long id) {
+        return repo.findById(id)
+                .orElseThrow(()-> new RuntimeException("Failed to retrieve product with id: " + id));
     }
 
     @PostMapping("/products")
